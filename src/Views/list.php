@@ -32,17 +32,37 @@ echo get_header( [ 'title' => 'Accueil' ] );
       <form method="post">
         
       <?php
-        $date = null;
-        foreach($tasks as $task){
-            if(!isset($date) || $date !== date('d/m/Y', strtotime($task->getCreatedAt()))){
-                $date = $task->getCreatedAt();
-                $date = date('d/m/Y', strtotime($date));
-                echo '<h2 class="text-xl font-bold uppercase tracking-widest mb-4">' . $date. '</h2>';
-            }
-            echo get_template( __PROJECT_ROOT__ . "/Views/fragments/task-card.php", [
-              'task' => $task,
-            ] );
-        }
+      $atmdate = "";
+      $page = $_GET['page'] ?? 1;
+      switch ($page){
+          case 1:
+              $page = 0;
+              break;
+          case 2:
+              $page = 10;
+              break;
+          case 3:
+              $page = 20;
+              break;
+      }
+
+      $tasks = array_slice($tasks, $page, 10);
+      foreach ($tasks as $task){
+          $taskDate = date('d-m-Y', strtotime($task->getCreatedAt()));
+          if ($taskDate != $atmdate) {
+              $atmdate = $taskDate;
+              echo "<h2 class='text-xl font-bold uppercase tracking-widest flex-1 mt-8 mb-4'>$taskDate</h2>";
+          }
+
+          echo get_template( __PROJECT_ROOT__ . "/Views/fragments/task-card.php", [
+              'task' => $task
+          ]);
+
+          if (isset($_GET['search'])){
+              $search = $_GET['search'];
+          }
+      }
+
       ?>
         <!-- Pagination + Submit -->
         <div class="flex flex-row justify-space-between items-center">
@@ -53,13 +73,25 @@ echo get_header( [ 'title' => 'Accueil' ] );
           
           <!-- Pagination -->
           <div class="flex-1 flex flex-row justify-end space-x-4 my-8">
-            <a class="block bg-slate-50 hover:bg-slate-200 rounded p-4 text-sm cursor-pointer transition-colors duration-300">
+            <a class="block bg-slate-50 hover:bg-slate-200 rounded p-4 text-sm cursor-pointer transition-colors duration-300" href="<?php
+            $params=$_GET;
+            $params['page'] = 1;
+            echo "/?" .http_build_query($params);
+            ?>">
               1
             </a>
-            <a class="block bg-slate-50 hover:bg-slate-200 rounded p-4 text-sm cursor-pointer transition-colors duration-300">
+            <a class="block bg-slate-50 hover:bg-slate-200 rounded p-4 text-sm cursor-pointer transition-colors duration-300" href="<?php
+            $params=$_GET;
+            $params['page'] = 1;
+            echo "/?" .http_build_query($params);
+            ?>">
               2
             </a>
-            <a class="block bg-slate-50 hover:bg-slate-200 rounded p-4 text-sm cursor-pointer transition-colors duration-300">
+            <a class="block bg-slate-50 hover:bg-slate-200 rounded p-4 text-sm cursor-pointer transition-colors duration-300" href="<?php
+            $params=$_GET;
+            $params['page'] = 1;
+            echo "/?" .http_build_query($params);
+            ?>">
               3
             </a>
           </div>
